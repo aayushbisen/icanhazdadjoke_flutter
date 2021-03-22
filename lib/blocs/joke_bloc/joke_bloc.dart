@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:icanhazdadjoke_flutter/db/joke_dao.dart';
 import 'package:icanhazdadjoke_flutter/joke.dart';
 import 'package:meta/meta.dart';
 
@@ -21,6 +22,7 @@ class JokeBloc extends Bloc<JokeEvent, JokeState> {
       yield LoadingJokeState();
       try {
         final joke = await _dataService.getJoke();
+
         yield LoadedJokeState(joke: joke);
       } catch (e) {
         yield FailToLoadJokeState(error: e);
