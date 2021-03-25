@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:icanhazdadjoke_flutter/blocs/joke_bloc/joke_bloc.dart';
 import 'package:icanhazdadjoke_flutter/db/joke_dao.dart';
+import 'package:icanhazdadjoke_flutter/db/joke_provider.dart';
 import 'package:icanhazdadjoke_flutter/saved_jokes_page.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
   final title;
@@ -18,6 +20,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _jokeDao = JokeDAO();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +37,10 @@ class _MyHomePageState extends State<MyHomePage> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => SavedJokesPage(),
+                  builder: (context) => ChangeNotifierProvider.value(
+                    value: JokesProvider(_jokeDao),
+                    child: SavedJokesPage(),
+                  ),
                 ),
               );
             },
@@ -84,14 +91,14 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          BlocConsumer<JokeBloc,JokeState>(
+          BlocConsumer<JokeBloc, JokeState>(
             listener: (context, state) {},
             builder: (context, state) => FloatingActionButton(
               heroTag: null,
               child: Icon(Icons.save_alt),
               onPressed: state is LoadedJokeState
                   ? () {
-                      JokeDAO().insert(state.joke);
+                      _jokeDao.insert(state.joke);
                     }
                   : null,
             ),
